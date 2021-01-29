@@ -3,7 +3,7 @@ const app = express()
 const port = process.env.PORT || 3000
 app.use(express.json())
 app.post('/', (req, res) => {
-    const text = req.body.message.text
+    const text = req.body.message.text.toLowerCase()
     const postback = req.body.message.postback
 
     /* START OF ACTIONS */
@@ -32,12 +32,13 @@ app.post('/', (req, res) => {
     }
     /* END OF IMAGE */
 
-    const _ssml = '<speak>How do you spell Delight? It is <say-as interpret-as="verbatim">delight</say-as></speak>'
+
     let _responseText
     if (postback)
         _responseText = `Received postback: ${postback}`
     else
         _responseText = `Received text: ${text}`
+
     /* 
     Every object can start with this response
 
@@ -75,6 +76,7 @@ app.post('/', (req, res) => {
     //     }
     // }
 
+    const _ssml = ''
     const textResponse = {
         text: _responseText, //required
         ssml: _ssml, //optional
@@ -85,6 +87,13 @@ app.post('/', (req, res) => {
         case 'text':
             // text response
             res.json(textResponse)
+            break
+
+        case 'ssml':
+            res.json({
+                text: _responseText,
+                ssml: '<speak>How do you spell Delight? It is <say-as interpret-as="verbatim">delight</say-as></speak>', //optional
+            })
             break
 
         case 'card':
@@ -126,6 +135,52 @@ app.post('/', (req, res) => {
                 }]
             }
             res.json(carouselResponse)
+            break
+
+        // case 'email':
+        //     res.json({
+        //         'helperIntent': {
+        //             'name': 'get_email',
+        //             'success_callback': 'get_email_success'
+        //         }
+        //     })
+        //     break
+
+        case 'raw':
+            /*
+            We override the google action response in the override field.
+            As a result, google action user will receive a different response than the rest.
+            */
+            res.json({
+                text: 'Only google action will see override response.',
+                'override': {
+                    'googleaction': {
+                        'raw': {
+                            "expectUserResponse": true,
+                            "expectedInputs": [
+                                {
+                                    "possibleIntents": [
+                                        {
+                                            "intent": "actions.intent.TEXT"
+                                        }
+                                    ],
+                                    "inputPrompt": {
+                                        "richInitialPrompt": {
+                                            "items": [
+                                                {
+                                                    "simpleResponse": {
+                                                        "textToSpeech": "Here's an example of override google action response. Which type of response would you like to see next?"
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            })
             break
 
         default:
