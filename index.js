@@ -154,6 +154,26 @@ app.post('/', (req, res) => {
             res.json({
                 text: 'Only google action will see override response.',
                 'override': {
+                    'alexa': {
+                        'raw': {"version": "1.0", "response": {"outputSpeech": {"type": "PlainText", "text": "This is a message from alexa raw mode"}, "shouldEndSession": false}}
+                    },
+                    'bixby': {
+                        'raw': {'text': 'This is a message from bixby raw mode'}
+                    },
+                    'telegram':{
+                        'raw': {'text': 'This is a message from telegram raw mode'}
+                    },
+                    'line': {
+                        'raw': [{"quickReply": {"items": [{"action": {"label": "Option 1", "text": "Option 1", "type": "message"}, "type": "action"}, {"action": {"label": "Link Button", "text": "Link Button", "type": "message"}, "type": "action"}, {"action": {"label": "Postback button", "text": "Postback button", "type": "message"}, "type": "action"}]}, "text": "This is a message from line raw mode", "type": "text"}]  // line can support sending multiple messages in the same request, so we need to wrap it in array
+                    },
+                    'wechat': {
+                        'raw': {
+                            'msgtype': 'text',
+                            'text': {
+                                'content': 'This is a message from wechat raw mode',
+                            }
+                        }
+                    },
                     'googleaction': {
                         'raw': {
                             "expectUserResponse": true,
